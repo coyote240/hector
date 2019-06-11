@@ -1,0 +1,3 @@
+flake8==3.7.7
+mitmproxy==4.0.4
+PyYAML==5.1.1
