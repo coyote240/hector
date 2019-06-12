@@ -6,7 +6,7 @@ from mitmproxy import ctx
 class Hector:
 
     def __init__(self):
-        self._output = {}
+        self._output = AutovivifyDict()
 
     def load(self, loader):
         loader.add_option(
@@ -46,16 +46,36 @@ class Hector:
         request = flow.request
 
         if request.host not in self._output:
-            self._output[request.host] = copy.deepcopy(self._template)
+            self._output[request.host] = SwaggerDoc(request.host)
 
         target = self._output[request.host]
-        target['host'] = request.host
 
-        if request.scheme not in target['schemes']:
-            target['schemes'].append(request.scheme)
+        target.schemes.add(request.scheme)
+        target.paths[request.path][request.method] = {}
 
-        if request.path not in target:
-            target['paths'][request.path] = {}
+
+class SwaggerDoc(yaml.YAMLObject):
+
+    yaml_tag = '!Swagger'
+
+    def __init__(self, host):
+        self.swagger = '2.0'
+        self.info = {
+            'version': '0.0.1',
+            'title': 'Test API',
+            'description': 'Dummy Swagger Specification'
+        }
+        self.schemes = set()
+        self.host = host
+        self.basePath = ''
+        self.paths = AutovivifyDict()
+
+
+class AutovivifyDict(dict):
+
+    def __missing__(self, key):
+        value = self[key] = type(self)()
+        return value
 
 
 addons = [
