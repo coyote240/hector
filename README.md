@@ -53,3 +53,4 @@ previous session. Default: `None`
 * Add option to filter by host or regex
 * Optionally write to multiple files instead of just one
 * Post-process swagger to collapse on base-path
+* Add a command to trigger a write to file
